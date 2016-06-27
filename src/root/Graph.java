@@ -9,10 +9,8 @@ public class Graph {
 	protected String arg2[][];
 	
 	public Graph(int number) {
-		// по-хорошему, здесь нужно считать из файла либо получить иначе
 		numberVertex = number;
 		matrix = new Integer[numberVertex][numberVertex];
-		arg2 = new String[numberVertex][numberVertex];
 		arg1 = new Integer[numberVertex];
 		
 		for (int i = 0; i<number; i++){
@@ -22,7 +20,6 @@ public class Graph {
 		for (int i = 0; i<number; i++){
 			for (int j = 0; j<number; j++){
 				matrix[i][j]=0;
-		//	arg2[i][j] = matrix[i][j];
 			}
 		}
 	}
