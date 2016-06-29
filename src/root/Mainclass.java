@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -18,11 +19,13 @@ import javax.swing.table.DefaultTableModel;
 import root.TableWithRowHeader;
 
 public final class MainClass extends JFrame implements Runnable {
+	private static final long serialVersionUID = 1L;
 	// tmp
 	JTextArea text = new JTextArea("Здесь будет граф");
 
 	// контент
 	JButton butNext = new JButton("Начать выполнение");
+	JButton butOut = new JButton("Вывести результат в файл");
 	JMenuBar mBar = new JMenuBar();
 	JMenu mCreate = new JMenu("Задать граф");
 	JMenuItem mFile = new JMenuItem("Указать файл");
@@ -33,6 +36,9 @@ public final class MainClass extends JFrame implements Runnable {
 	JPanel leftPanel = new JPanel();
 	JPanel matrixPanel = new JPanel();
 	JPanel buttonPanel = new JPanel();
+
+	Graph graph;
+	int step = 0;
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new MainClass());
@@ -67,7 +73,9 @@ public final class MainClass extends JFrame implements Runnable {
 		// кнопка
 		leftPanel.add(buttonPanel, BorderLayout.SOUTH);
 		butNext.setEnabled(false);
-		buttonPanel.add(butNext, BorderLayout.WEST);
+		butOut.setEnabled(false);
+		buttonPanel.add(butNext);
+		buttonPanel.add(butOut);
 		buttonPanel.setPreferredSize(new Dimension(200, 100));
 		buttonPanel.setBackground(Color.WHITE);
 
@@ -94,10 +102,49 @@ public final class MainClass extends JFrame implements Runnable {
 			}
 		});
 
+		butOut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt","*.*");
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileFilter(filter);
+				FileWriter filewriter;
+				if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+					try {
+						filewriter = new FileWriter(chooser.getSelectedFile());
+						for (int i = 0; i < graph.getNum(); i++) {
+							for (int j = 0; j < graph.getNum(); j++) {
+								if (graph.getMatrix()[i][j] == 99999) {
+									filewriter.write("- ");
+								} else {
+									filewriter.write(graph.getMatrix()[i][j] + " ");
+								}
+							}
+							filewriter.write("\n");
+
+						}
+						filewriter.flush();
+						JOptionPane.showMessageDialog(getParent(), "Файл с результатами создан");
+					} catch (IOException e1) {
+						JOptionPane.showMessageDialog(getParent(), "Ошибка", "Ошибка записи",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		});
+
 		// активность меню
 		mFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				open();
+			}
+		});
+
+		mHand.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CustomDialog addG = new CustomDialog(null);
+				if (addG.isReady()) {
+					prepareAlgo(addG.getInt(), addG.getMasInt());
+				}
 			}
 		});
 	}
@@ -114,7 +161,6 @@ public final class MainClass extends JFrame implements Runnable {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 
 			System.out.println("You chose to open this file: " + chooser.getSelectedFile().getName());
-
 			try {
 				BufferedReader bufRdr;
 				bufRdr = new BufferedReader(new FileReader(chooser.getSelectedFile()));
@@ -160,18 +206,35 @@ public final class MainClass extends JFrame implements Runnable {
 		for (int i = 0; i < num; i++) {
 			head[i] = i + 1;
 		}
-		Graph graph = new Graph(num);
+		graph = new Graph(num);
 		graph.arg1 = head;
-		graph.matrix = matr;
+		for (int i = 0; i < graph.getNum(); i++) {
+			for (int j = 0; j < graph.getNum(); j++) {
+				if (matr[i][j] != 0) {
+					graph.matrix[i][j] = matr[i][j];
+				} else {
+					graph.matrix[i][j] = 99999;
+				}
+			}
+		}
+
+		step = 0;
 		showMatrix(graph.matrix, graph.arg1);
 		butNext.setText("Начать выполнение");
 		butNext.setEnabled(true);
+		butOut.setEnabled(false);
 	}
 
 	public void showAlgo() {
 		butNext.setText("Далее");
-		// что-то делается
-		// а потом кнопка снова не работает
+		if (step < graph.getNum()) {
+			graph.solve(step);
+			showMatrix(graph.getMatrix(), graph.getArg1());
+			step++;
+		} else {
+			butNext.setEnabled(false);
+			butOut.setEnabled(true);
+		}
 	}
 
 	public void showMatrix(Object[][] data, Object[] headers) {
@@ -228,4 +291,5 @@ public final class MainClass extends JFrame implements Runnable {
 		gmScroll.setRowHeader(new JViewport());
 		matrixPanel.add(gmScroll);
 	}
+
 }

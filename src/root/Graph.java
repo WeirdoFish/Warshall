@@ -1,12 +1,14 @@
 package root;
 
+import com.mxgraph.swing.*;
+import com.mxgraph.view.*;
 
 public class Graph {
-
+	mxGraph a = new mxGraph();
+	
 	private int numberVertex;
 	protected Integer matrix[][];
 	protected Integer arg1[];
-	protected String arg2[][];
 	
 	public Graph(int number) {
 		numberVertex = number;
@@ -19,18 +21,31 @@ public class Graph {
 		
 		for (int i = 0; i<number; i++){
 			for (int j = 0; j<number; j++){
-				matrix[i][j]=0;
+				matrix[i][j]=10000;
 			}
 		}
 	}
 
-	protected void solve() {
-		for (int k = 0; k < numberVertex; k++) {
+	protected void solve(int step) {
+		//for (int k = 0; k < numberVertex; k++) {
+		//ќЋя, тут вывод графа
+		
 			for (int i = 0; i < numberVertex; i++) {
 				for (int j = 0; j < numberVertex; j++) {
-					matrix[i][j] = Math.min(matrix[i][j], matrix[i][k] + matrix[k][j]);
+					matrix[i][j] = Math.min(matrix[i][j], matrix[i][step] + matrix[step][j]);
 				}
 			}
-		}
+		//}
+	}
+	
+	protected int getNum(){
+		return numberVertex;
+	}
+	
+	protected Integer[][] getMatrix(){
+		return matrix;
+	}
+	protected Integer[] getArg1(){
+		return arg1;
 	}
 }
