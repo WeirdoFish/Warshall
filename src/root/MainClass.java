@@ -110,24 +110,30 @@ public final class MainClass extends JFrame implements Runnable {
 
 		butOut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File newFile = new File("output_" + filename);
-				try {
-					FileWriter filewriter = new FileWriter(newFile);
-					for (int i = 0; i < graph.getNum(); i++) {
-						for (int j = 0; j < graph.getNum(); j++) {
-							if (graph.getMatrix()[i][j] == 99999) {
-								filewriter.write("- ");
-							} else {
-								filewriter.write(graph.getMatrix()[i][j] + " ");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt","*.*");
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileFilter(filter);
+				FileWriter filewriter;
+				if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+					try {
+						filewriter = new FileWriter(chooser.getSelectedFile());
+						for (int i = 0; i < graph.getNum(); i++) {
+							for (int j = 0; j < graph.getNum(); j++) {
+								if (graph.getMatrix()[i][j] == 99999) {
+									filewriter.write("- ");
+								} else {
+									filewriter.write(graph.getMatrix()[i][j] + " ");
+								}
 							}
-						}
-						filewriter.write("\n");
+							filewriter.write("\n");
 
+						}
+						filewriter.flush();
+						JOptionPane.showMessageDialog(getParent(), "Файл с результатами создан");
+					} catch (IOException e1) {
+						JOptionPane.showMessageDialog(getParent(), "Ошибка", "Ошибка записи",
+								JOptionPane.ERROR_MESSAGE);
 					}
-					filewriter.flush();
-					JOptionPane.showMessageDialog(getParent(), "Файл с результатами создан");
-				} catch (IOException e1) {
-					JOptionPane.showMessageDialog(getParent(), "Ошибка", "Ошибка записи", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -208,6 +214,7 @@ public final class MainClass extends JFrame implements Runnable {
 			head[i] = i + 1;
 		}
 		graph = new Graph(num, head, matr);
+		rightPanel.removeAll();
 		rightPanel.add(graph);
 		revalidate();
 
