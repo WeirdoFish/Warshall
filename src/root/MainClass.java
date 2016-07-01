@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,7 +20,11 @@ import javax.swing.table.DefaultTableModel;
 import root.TableWithRowHeader;
 
 public final class MainClass extends JFrame implements Runnable {
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
+
 	// tmp
 	JTextArea text = new JTextArea("Здесь будет граф");
 
@@ -30,6 +35,7 @@ public final class MainClass extends JFrame implements Runnable {
 	JMenu mCreate = new JMenu("Задать граф");
 	JMenuItem mFile = new JMenuItem("Указать файл");
 	JMenuItem mHand = new JMenuItem("Ввести вручную");
+	String filename = ".txt";
 
 	// панели окна
 	JPanel rightPanel = new JPanel();
@@ -81,7 +87,7 @@ public final class MainClass extends JFrame implements Runnable {
 
 		// граф
 		add(rightPanel, BorderLayout.EAST);
-		rightPanel.add(text);
+		// rightPanel.add(text);
 		rightPanel.setBackground(Color.WHITE);
 		rightPanel.setPreferredSize(new Dimension(600, 600));
 		rightPanel.setBorder(new TitledBorder("Граф"));
@@ -104,30 +110,24 @@ public final class MainClass extends JFrame implements Runnable {
 
 		butOut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt","*.*");
-				JFileChooser chooser = new JFileChooser();
-				chooser.setFileFilter(filter);
-				FileWriter filewriter;
-				if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-					try {
-						filewriter = new FileWriter(chooser.getSelectedFile());
-						for (int i = 0; i < graph.getNum(); i++) {
-							for (int j = 0; j < graph.getNum(); j++) {
-								if (graph.getMatrix()[i][j] == 99999) {
-									filewriter.write("- ");
-								} else {
-									filewriter.write(graph.getMatrix()[i][j] + " ");
-								}
+				File newFile = new File("output_" + filename);
+				try {
+					FileWriter filewriter = new FileWriter(newFile);
+					for (int i = 0; i < graph.getNum(); i++) {
+						for (int j = 0; j < graph.getNum(); j++) {
+							if (graph.getMatrix()[i][j] == 99999) {
+								filewriter.write("- ");
+							} else {
+								filewriter.write(graph.getMatrix()[i][j] + " ");
 							}
-							filewriter.write("\n");
-
 						}
-						filewriter.flush();
-						JOptionPane.showMessageDialog(getParent(), "Файл с результатами создан");
-					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(getParent(), "Ошибка", "Ошибка записи",
-								JOptionPane.ERROR_MESSAGE);
+						filewriter.write("\n");
+
 					}
+					filewriter.flush();
+					JOptionPane.showMessageDialog(getParent(), "Файл с результатами создан");
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(getParent(), "Ошибка", "Ошибка записи", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -161,6 +161,7 @@ public final class MainClass extends JFrame implements Runnable {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 
 			System.out.println("You chose to open this file: " + chooser.getSelectedFile().getName());
+			filename = chooser.getSelectedFile().getName();
 			try {
 				BufferedReader bufRdr;
 				bufRdr = new BufferedReader(new FileReader(chooser.getSelectedFile()));
@@ -206,17 +207,9 @@ public final class MainClass extends JFrame implements Runnable {
 		for (int i = 0; i < num; i++) {
 			head[i] = i + 1;
 		}
-		graph = new Graph(num);
-		graph.arg1 = head;
-		for (int i = 0; i < graph.getNum(); i++) {
-			for (int j = 0; j < graph.getNum(); j++) {
-				if (matr[i][j] != 0) {
-					graph.matrix[i][j] = matr[i][j];
-				} else {
-					graph.matrix[i][j] = 99999;
-				}
-			}
-		}
+		graph = new Graph(num, head, matr);
+		rightPanel.add(graph);
+		revalidate();
 
 		step = 0;
 		showMatrix(graph.matrix, graph.arg1);
@@ -227,11 +220,14 @@ public final class MainClass extends JFrame implements Runnable {
 
 	public void showAlgo() {
 		butNext.setText("Далее");
+
+		// перекрасить
 		if (step < graph.getNum()) {
 			graph.solve(step);
 			showMatrix(graph.getMatrix(), graph.getArg1());
 			step++;
 		} else {
+			graph.solve(step - 1); // изменено
 			butNext.setEnabled(false);
 			butOut.setEnabled(true);
 		}
