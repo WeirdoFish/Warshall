@@ -25,7 +25,12 @@ public class TableWithRowHeader  extends JTable{
 
     class RowNumberTableModel extends AbstractTableModel
     {
-        public int getRowCount(){
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public int getRowCount(){
              return mainTable.getModel().getRowCount();
         }
 

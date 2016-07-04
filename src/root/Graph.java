@@ -4,7 +4,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Queue;
 
-
 import javax.swing.JPanel;
 
 import com.mxgraph.swing.mxGraphComponent;
@@ -13,7 +12,6 @@ import com.mxgraph.util.mxConstants;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxStylesheet;
 import com.mxgraph.layout.mxCircleLayout;
-
 
 public class Graph extends JPanel {
 	/**
@@ -89,8 +87,7 @@ public class Graph extends JPanel {
 			for (int i = 0; i < numberVertex; i++) {
 				for (int j = 0; j < numberVertex; j++) {
 					if (matrix[i][j] != 99999) {
-						gg.insertEdge(parent, null, Integer.toString(matrix[i][j]), v_gg[i], v_gg[j],
-								"strokeColor=" + e_color_begin);
+						gg.insertEdge(parent, null, null, v_gg[i], v_gg[j], "strokeColor=" + e_color_begin);
 					}
 
 				}
@@ -125,8 +122,7 @@ public class Graph extends JPanel {
 					try {
 						// заполнение вершин
 
-						gg.insertEdge(parent, null, Integer.toString(matrix[i][j]), v_gg[i], v_gg[j],
-								"strokeColor=" + e_color_tmp);
+						gg.insertEdge(parent, null, null, v_gg[i], v_gg[j], "strokeColor=" + e_color_tmp);
 						e_queue.add(i);
 						e_queue.add(j);
 
@@ -160,8 +156,7 @@ public class Graph extends JPanel {
 			while (!e_queue.isEmpty()) {
 				i = e_queue.poll();
 				j = e_queue.poll();
-				gg.insertEdge(parent, null, Integer.toString(matrix[i][j]), v_gg[i], v_gg[j],
-						"strokeColor=" + e_color_end);
+				gg.insertEdge(parent, null, null, v_gg[i], v_gg[j], "strokeColor=" + e_color_end);
 			}
 
 		} finally {
